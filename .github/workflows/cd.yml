@@ -1,0 +1,74 @@
+name: CD
+on:
+  release:
+    types: [published]
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  deploy:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install cargo-deb
+        if: matrix.os == 'ubuntu-latest'
+        run: cargo install cargo-deb
+
+      - name: Build Release
+        run: make build
+
+      - name: Package release for Mac
+        if: matrix.os == 'macos-latest'
+        run: make release-mac
+
+      - name: Package release for Linux
+        if: matrix.os == 'ubuntu-latest'
+        run: make release-linux
+
+      - name: Package Debian release
+        if: matrix.os == 'ubuntu-latest'
+        run: make release-deb
+
+      - name: Package release for Windows
+        if: matrix.os == 'windows-latest'
+        run: make release-win
+
+      - name: Publish to GitHub
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ github.event.release.tag_name }}
+          files: |
+            ./release/*.tar.gz
+            ./release/*.deb
+            ./onefetch-setup.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to WinGet
+        uses: vedantmgoyal9/winget-releaser@main
+        if: matrix.os == 'windows-latest'
+        with:
+          identifier: o2sh.onefetch
+          installers-regex: '\.exe$'
+          version: ${{ github.event.release.tag_name }}
+          token: ${{ secrets.WINGET_TOKEN }}
+
+  crates:
+    name: Publish to crates.io
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Publish to crates.io
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: cargo publish --locked

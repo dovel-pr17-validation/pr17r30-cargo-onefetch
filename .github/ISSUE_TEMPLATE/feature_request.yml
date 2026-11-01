@@ -1,0 +1,17 @@
+name: Feature request 💄
+description: Suggest an improvement
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for contributing by creating an issue! ❤️
+  - type: textarea
+    attributes:
+      label: Summary 💡
+      description: Describe how it should work.
+  - type: textarea
+    attributes:
+      label: Motivation 🔦
+      description: >
+        What are you trying to accomplish?
+        How has the lack of this feature affected you?

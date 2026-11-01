@@ -1,0 +1,41 @@
+name: Site CI
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "site/**"
+      - "languages.yaml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "site/**"
+      - "languages.yaml"
+
+jobs:
+  check:
+    name: Check Code Quality
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: site
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Svelte Check
+        run: npm run check:svelte -- --fail-on-warnings
+
+      - name: ESLint
+        run: npm run check:lint
+
+      - name: Prettier
+        run: npm run check:prettier

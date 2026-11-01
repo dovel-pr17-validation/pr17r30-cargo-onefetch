@@ -1,0 +1,41 @@
+name: CI
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
+      - "site/**"
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
+      - "site/**"
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  CI:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # Only on Linux: .rustfmt.toml enforces Unix newlines and Windows checks out with CRLF.
+      - name: Check formatting
+        if: matrix.os == 'ubuntu-latest'
+        run: cargo fmt --check
+
+      - name: Clippy
+        run: cargo clippy --locked --all-targets -- -D warnings
+
+      - name: Build
+        run: cargo build --locked
+
+      - name: Run tests
+        run: cargo test --locked

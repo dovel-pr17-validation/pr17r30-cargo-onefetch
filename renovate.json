@@ -1,0 +1,40 @@
+{
+  "extends": ["config:recommended"],
+  "commitMessagePrefix": "chore(deps):",
+  "labels": ["dependencies"],
+  "dependencyDashboard": false,
+  "enabledManagers": ["cargo", "github-actions", "npm"],
+  "packageRules": [
+    {
+      "matchManagers": ["cargo"],
+      "schedule": ["before 4am on Monday"],
+      "rangeStrategy": "bump"
+    },
+    {
+      "matchManagers": ["cargo"],
+      "matchPackageNames": ["clap", "clap_*"],
+      "groupName": "clap"
+    },
+    {
+      "matchManagers": ["cargo"],
+      "matchPackageNames": ["gix", "gix-*"],
+      "groupName": "gix"
+    },
+    {
+      "matchManagers": ["cargo"],
+      "matchPackageNames": ["image", "color_quant"],
+      "groupName": "image"
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "schedule": ["before 4am on Monday"]
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchFileNames": ["site/**"],
+      "schedule": ["before 4am on the first day of the month"],
+      "groupName": "site",
+      "rangeStrategy": "bump"
+    }
+  ]
+}

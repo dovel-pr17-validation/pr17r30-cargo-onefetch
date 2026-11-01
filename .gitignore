@@ -1,0 +1,10 @@
+/target
+**/*.rs.bk
+/stage
+/parts
+/prime
+.gitignore.swp
+.DS_Store
+result
+**/generated-*
+**/.idea
